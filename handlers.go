@@ -20,10 +20,6 @@ type indexPage struct {
 
 var indexT = must(template.ParseFS(templateFiles, "templates/index.html.tmpl"))
 
-// type todoItemView struct {
-// 	Task Task
-// }
-
 var itemT = must(template.ParseFS(templateFiles, "templates/includes/todo-item.tmpl"))
 
 type itemCountView struct {
