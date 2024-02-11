@@ -2,8 +2,12 @@ package main
 
 import (
 	"embed"
+	"io/fs"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/gorilla/handlers"
 )
 
 //go:embed assets/css
@@ -12,17 +16,21 @@ var cssFiles embed.FS
 func main() {
 	var store Store
 
-	// cssFS := fs.FS(cssFiles)
-	// http.Handle("/css", http.FileServer(http.FS(cssFS)))
-	http.Handle("/css/", http.FileServer(http.Dir("assets")))
+	middleware := func(next http.Handler) http.Handler {
+		return handlers.LoggingHandler(os.Stdout, next)
+	}
 
-	http.HandleFunc("/", handleGetIndex(&store))
-	http.HandleFunc("/todos/new", handlePostToDo(&store))
-	http.HandleFunc("/todos/edit/", handleGetEdit(&store))
-	http.HandleFunc("/todos/done/", handlePatchDone(&store))
-	http.HandleFunc("/todos/update/", handlePostUpdate(&store))
-	http.HandleFunc("/todos/delete/", handlePostDelete(&store))
-	http.HandleFunc("/todos/clear-completed", handlePostClearCompleted(&store))
+	cssFS := fs.FS(cssFiles)
+	http.Handle("/css", middleware(http.FileServer(http.FS(cssFS))))
+	// http.Handle("/css/", middleware(http.FileServer(http.Dir("assets"))))
+
+	http.Handle("/", middleware(handleGetIndex(&store)))
+	http.Handle("/todos/new", middleware(handlePostToDo(&store)))
+	http.Handle("/todos/edit/", middleware(handleGetEdit(&store)))
+	http.Handle("/todos/done/", middleware(handlePatchDone(&store)))
+	http.Handle("/todos/update/", middleware(handlePostUpdate(&store)))
+	http.Handle("/todos/delete/", middleware(handlePostDelete(&store)))
+	http.Handle("/todos/clear-completed", middleware(handlePostClearCompleted(&store)))
 
 	log.Fatal(http.ListenAndServe(":38080", logRequest(http.DefaultServeMux)))
 }
