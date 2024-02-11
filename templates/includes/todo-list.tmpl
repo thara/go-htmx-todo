@@ -1,0 +1,9 @@
+{{range .ToDoList}}
+                    <li class="{{ if .Done}}completed{{ end }}" >
+                        <div class="view">
+                            <input class="toggle" type="checkbox" {{ if .Done}}checked{{ end }} hx-patch="/todos/{{ .ID }}" hx-target='#todo-{{ .ID }}' hx-swap="outerHTML">
+                            <label hx-get="/todos/edit/{{ .ID }}" hx-target="#todo-{{ .ID }}" hx-swap="outerHTML">{{ .Note }}</label>
+                            <button class="destroy" hx-delete="/todos/{{ .ID }}"></button>
+                        </div>
+                    </li>
+{{end}}
