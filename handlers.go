@@ -91,10 +91,10 @@ func handlePostToDo(store *Store) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		// if err := itemCountT.Execute(w, itemCountView{ItemsLeft: store.GetItemLeft()}); err != nil {
-		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-		// 	return
-		// }
+		if err := itemCountT.Execute(w, itemCountView{ItemsLeft: store.GetItemLeft()}); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }
 
